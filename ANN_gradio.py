@@ -7,27 +7,24 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 import gradio as gr
 
-# Load dataset
+
 df = pd.read_csv(r"C:\Users\Dell\Work_tasks\Iris.csv")
 
-# Prepare the dataset
 X = df[['SepalLengthCm', 'SepalWidthCm', 'PetalLengthCm', 'PetalWidthCm']].values
 y = pd.get_dummies(df['Species']).values
 
-# Standardize features
+
 scaler = StandardScaler()
 X = scaler.fit_transform(X)
 
-# Split data into training and testing sets
+
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Convert to torch tensors
 X_train = torch.tensor(X_train, dtype=torch.float32)
 X_test = torch.tensor(X_test, dtype=torch.float32)
 y_train = torch.tensor(np.argmax(y_train, axis=1), dtype=torch.long)
 y_test = torch.tensor(np.argmax(y_test, axis=1), dtype=torch.long)
 
-# Define the neural network model
 class ImprovedIrisANN(nn.Module):
     def __init__(self, input_size, hidden_size, output_size):
         super(ImprovedIrisANN, self).__init__()
@@ -41,7 +38,7 @@ class ImprovedIrisANN(nn.Module):
         x = self.output(x)
         return x
 
-# Initialize model and optimizer
+
 input_size = X.shape[1]
 hidden_size = 10
 output_size = y.shape[1]
@@ -52,7 +49,7 @@ model = ImprovedIrisANN(input_size, hidden_size, output_size)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
-# Train the model
+
 for epoch in range(epochs):
     model.train()
     optimizer.zero_grad()
@@ -63,7 +60,7 @@ for epoch in range(epochs):
     train_loss.backward()
     optimizer.step()
 
-# Function for prediction
+
 def predict_species(sepal_length, sepal_width, petal_length, petal_width):
     input_data = np.array([[sepal_length, sepal_width, petal_length, petal_width]])
     input_data = scaler.transform(input_data)  
@@ -77,14 +74,14 @@ def predict_species(sepal_length, sepal_width, petal_length, petal_width):
     species = ['Setosa', 'Versicolor', 'Virginica']
     return species[predicted.item()]
 
-# Set up Gradio interface
+
 iface = gr.Interface(
     fn=predict_species,
     inputs=[
-        gr.Slider(minimum=4, maximum=8, value=5.0, label="Sepal Length (cm)"),  # Use 'value' instead of 'default'
-        gr.Slider(minimum=2, maximum=4.5, value=3.0, label="Sepal Width (cm)"),  # Use 'value' instead of 'default'
-        gr.Slider(minimum=1, maximum=7, value=4.5, label="Petal Length (cm)"),  # Use 'value' instead of 'default'
-        gr.Slider(minimum=0.1, maximum=2.5, value=1.5, label="Petal Width (cm)")  # Use 'value' instead of 'default'
+        gr.Slider(minimum=4, maximum=8, value=5.0, label="Sepal Length (cm)"),  
+        gr.Slider(minimum=2, maximum=4.5, value=3.0, label="Sepal Width (cm)"),  
+        gr.Slider(minimum=1, maximum=7, value=4.5, label="Petal Length (cm)"), 
+        gr.Slider(minimum=0.1, maximum=2.5, value=1.5, label="Petal Width (cm)")  
     ],
     outputs="text",
     live=True,
